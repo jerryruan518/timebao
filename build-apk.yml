@@ -13,7 +13,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.9'   # 稳定版本，与 flet 兼容
+          flutter-version: '3.16.9'
           channel: 'stable'
           
       - name: Setup Python
@@ -26,8 +26,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install flet pandas openpyxl
           
-      - name: Build APK
-        run: flet build apk --split-per-abi --verbose
+      - name: Verify Flutter installation
+        run: flutter doctor -v
+          
+      - name: Build APK (non‑interactive)
+        run: |
+          # 强制 Flet 使用已安装的 Flutter，避免它尝试自动安装
+          export FLUTTER_ROOT=${{ steps.setup-flutter.outputs.flutter-path }}
+          flet build apk --split-per-abi --verbose
           
       - name: Upload APK
         uses: actions/upload-artifact@v4
